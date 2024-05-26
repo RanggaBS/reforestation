@@ -51,7 +51,7 @@ jobs:
 
           COMMIT_MESSAGE=""
 
-          TODAY=$(date +%A)
+          TODAY=$(TZ="Asia/Jakarta" date +%A)
 
           ###################################
           # Commit message when it's Sunday #
