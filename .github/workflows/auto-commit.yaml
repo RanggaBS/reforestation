@@ -1,1 +1,104 @@
+# 🌳 Reboisasii
+# GitHub Actions auto commit task
 
+name: "Auto Commit (Reforestation)"
+
+on:
+  push:
+    branches:
+      - "main"
+
+  schedule:
+    # Total 12x commit each day
+    # 2x complete song commit
+    #
+    # [hour]: song_index
+    # 7: 5    ,14: 5
+    # 8: 4    ,19: 4
+    # 9: 3    ,20: 3
+    # 10: 2   ,21: 2
+    # 11: 1   ,22: 1
+    # 13: 0   ,23: 0
+    - cron: "0 7,8,9,10,11,13,14,19,20,21,22,23 * * *"
+
+jobs:
+  AUTO_COMMIT:
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: "Set Global Directory"
+        run: "git config --global --add safe.directory /github/workspace"
+
+      - name: "Run Bash Script to Modify Last Update"
+        run: |
+          # Give execution permission
+          chmod +x readme-update_date.sh
+
+          # Run the script
+          ./readme-update_date.sh
+
+      - name: "Commit Changes"
+        run: |
+          git config --local user.email "ranggabuanasaputra85@gmail.com"
+          git config --local user.name "ranggabs"
+          git add --all
+
+          COMMIT_MESSAGE=""
+
+          TODAY=$(date +%A)
+
+          ###################################
+          # Commit message when it's Sunday #
+          ###################################
+          if [[ $TODAY == "Sunday" ]]; then
+              EMOJIS=(
+                  '🌳' '🌲' '🏡' '🍏' '🎉'
+                  '✨' '🍃' '🍀' '🌿' '🥬'
+              )
+              EMOJIS_COUNT=${#EMOJIS[@]}
+              RANDOM_EMOJI_INDEX=$((RANDOM % EMOJIS_COUNT))
+              EMOJI=${EMOJIS[$RANDOM_EMOJI_INDEX]}
+              
+              COMMIT_MESSAGE="$EMOJI Reforestation"
+              
+          #######################################
+          # Commit message when it's not Sunday #
+          #######################################
+          else
+              LYRICS=(
+                  "Lihat kebunku"									# 0
+                  "Penuh dengan bunga"						# 1
+                  "Ada yang putih"								# 2
+                  "Dan ada yang merah"						# 3
+                  "Setiap hari kusiram semua"			# 4
+                  "Mawar, melati, semuanya indah"	# 5
+              )
+              LYRICS_COUNT=${#LYRICS[@]}
+              
+              # Pick song line for current commit message
+              CURRENT_SONG_LINE_INDEX=$(cat next_song_line_index.txt)
+              SONG_LINE=${$LYRICS[$CURRENT_SONG_LINE_INDEX]}
+              
+              # Update the next song line index
+              # 5 > 4 > 3 > 2 > 1 > 0
+              NEXT_SONG_LINE_INDEX=$((CURRENT_SONG_LINE_INDEX - 1))
+              if [[ $NEXT_SONG_LINE_INDEX < 0 ]]; then
+                  NEXT_SONG_LINE_INDEX=$((LYRICS_COUNT - 1))
+              fi
+              echo $NEXT_SONG_LINE_INDEX > next_song_line_index.txt # Write to file
+              
+              COMMIT_MESSAGE="$SONG_LINE"
+          fi
+
+          git commit -m "$COMMIT_MESSAGE"
+
+      - name: "Push Changes"
+        uses: "ad-m/github-push-action@v0.8.0"
+        with:
+          directory: "."
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: "main"
