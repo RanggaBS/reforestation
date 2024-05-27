@@ -9,7 +9,7 @@ on:
   push:
     branches:
       - "main"
-
+      
   schedule:
     # Total 12x commit each day
     # 2x complete song commit
@@ -31,10 +31,10 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
-
+          
       - name: "Set Global Directory"
         run: "git config --global --add safe.directory /github/workspace"
-
+        
       - name: "Run Bash Script to Modify Last Update"
         run: |
           # Give execution permission
@@ -48,11 +48,11 @@ jobs:
           git config --local user.email "ranggabuanasaputra85@gmail.com"
           git config --local user.name "ranggabs"
           git add --all
-
+          
           COMMIT_MESSAGE=""
-
+          
           TODAY=$(TZ="Asia/Jakarta" date +%A)
-
+          
           ###################################
           # Commit message when it's Sunday #
           ###################################
@@ -71,33 +71,24 @@ jobs:
           # Commit message when it's not Sunday #
           #######################################
           else
-              LYRICS=(
-                  "Lihat kebunku"                 # 0
-                  "Penuh dengan bunga"            # 1
-                  "Ada yang putih"                # 2
-                  "Dan ada yang merah"            # 3
-                  "Setiap hari kusiram semua"     # 4
-                  "Mawar, melati, semuanya indah" # 5
-              )
-              LYRICS_COUNT=${#LYRICS[@]}
+              # Import script
+              source LYRICS.sh
               
               # Pick song line for current commit message
               CURRENT_SONG_LINE_INDEX=$(cat next_song_line_index.txt)
               SONG_LINE=${LYRICS[$CURRENT_SONG_LINE_INDEX]}
               
-              # Update the next song line index
-              # 5 > 4 > 3 > 2 > 1 > 0
-              NEXT_SONG_LINE_INDEX=$((CURRENT_SONG_LINE_INDEX - 1))
-              if [[ $NEXT_SONG_LINE_INDEX < 0 ]]; then
-                  NEXT_SONG_LINE_INDEX=$((LYRICS_COUNT - 1))
-              fi
-              echo $NEXT_SONG_LINE_INDEX > next_song_line_index.txt # Write to file
+              # Give execution permission
+              chmod +x update_next_song_line_index.sh
+              
+              # Run the script
+              ./update_next_song_line_index.sh
               
               COMMIT_MESSAGE="$SONG_LINE"
           fi
-
+          
           git commit -m "$COMMIT_MESSAGE"
-
+          
       - name: "Push Changes"
         uses: "ad-m/github-push-action@v0.8.0"
         with:
