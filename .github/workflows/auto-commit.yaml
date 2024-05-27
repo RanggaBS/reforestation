@@ -83,7 +83,7 @@ jobs:
               
               # Pick song line for current commit message
               CURRENT_SONG_LINE_INDEX=$(cat next_song_line_index.txt)
-              SONG_LINE=${$LYRICS[$CURRENT_SONG_LINE_INDEX]}
+              SONG_LINE=${LYRICS[$CURRENT_SONG_LINE_INDEX]}
               
               # Update the next song line index
               # 5 > 4 > 3 > 2 > 1 > 0
