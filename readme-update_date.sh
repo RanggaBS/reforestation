@@ -20,9 +20,3 @@ echo "GitHub Actions time: $(date)" >> README.md
 echo '' >> README.md
 
 echo "Indonesia/Jakarta time: $(TZ="Asia/Jakarta" date)" >> README.md
-
-echo "[TEST] ls = $(ls)" >> README.md
-
-echo "[TEST] ls / = $(ls /)" >> README.md
-
-echo "[TEST] pwd = $(pwd)" >> README.md
