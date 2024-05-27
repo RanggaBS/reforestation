@@ -83,6 +83,9 @@ jobs:
               
               # Run the script
               ./update_next_song_line_index.sh
+
+              echo "[TEST] update_next_song_line_index was called"
+              echo "[TEST] update_next_song_line_index was called" > TEST_autocommit.txt
               
               COMMIT_MESSAGE="$SONG_LINE"
           fi
