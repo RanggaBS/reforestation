@@ -83,8 +83,6 @@ jobs:
               # Run the script
               ./update_next_song_line_index.sh
               
-              echo "[TEST] something.." >> README.md
-              
               COMMIT_MESSAGE="$SONG_LINE"
           fi
 
